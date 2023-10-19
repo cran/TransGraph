@@ -2,7 +2,6 @@
 
 export(Evaluation.DAG)
 export(Evaluation.GGM)
-export(Evaluation.GGMM)
 export(TLLiNGAM)
 export(Theta.est)
 export(Theta.tuning)

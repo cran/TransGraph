@@ -1,7 +1,7 @@
 #' Structural transfer learning of non-Gaussian DAG.
 #'
 #' @author Mingyang Ren <renmingyang17@mails.ucas.ac.cn>, Xin He, and Junhui Wang
-#' @references Ren, M., He X., and Wang J. (2022). Transfer learning for tensor graphical models.
+#' @references Ren, M., He X., and Wang J. (2023). Structural transfer learning of non-Gaussian DAG.
 #' @usage trans.local.DAG(t.data, A.data, hardth=0.5, hardth.A=hardth, criti.val=0.01,
 #'                        precision.method="glasso", precision.method.A = "CLIME",
 #'                        cov.method="opt", cn.lam2=seq(1,2.5,length.out=10),

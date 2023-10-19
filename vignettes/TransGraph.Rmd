@@ -160,7 +160,7 @@ of the covariance and divergence matrices as follows,
         \end{aligned}
     \end{equation} where the choice of weights $\{\alpha_k\}_{k=1}^{K}$
 shall depend on the contribution of each auxiliary domain and will be
-discussed in details in Section \ref{weights}. Also, it holds true that
+discussed in details later. Also, it holds true that
 $\boldsymbol{\Omega}_m \boldsymbol{\Sigma}_m^{\mathcal{A}} - \boldsymbol{\Delta}_{m} - \boldsymbol{I}_{p_m} = \boldsymbol{0}$.
 
 For each mode, a multi-step method can be proposed to realize the
@@ -283,7 +283,7 @@ This result leads to a simple bottom-up learning algorithm to re-construct ${\ca
 
 ### DAG similarity measures
 
-Denote the target DAG as ${\cal G}_0=\{ {\cal N},{\cal E}_0\}$, which encodes the joint distribution $P_0(\boldsymbol{x})$ of $\boldsymbol{x}=(x_1,...,x_p)^T$ with the precision matrix $\boldsymbol{\Theta}$. Suppose that there also exist $K$ auxiliary DAGs ${\cal G}_k=\{ {\cal N},{\cal E}_k\}$ with $k \in [K]$, encoding the joint distribution $P_k(\boldsymbol{x}^{(k)})$ of $\boldsymbol{x}^{(k)}=(x_1^{(k)},...,x_p^{(k)})^T$ with the precision matrix $\boldsymbol{\Theta}^{(k)}$ and the covariance matrix $\boldsymbol{\Sigma}^{(k)}$. The auxiliary domain $k$ can also be embedded into a linear SEM \eqref{eqn:1} with different parameters including the continuous non-Gaussian noise $\epsilon^{(k)}_j$ and its variance $[\sigma_j^{(k)}]^2$. It is of great interest to improve the learning accuracy of ${\cal G}_0$ in the target domain by leveraging information from ${\cal G}_k$ in the auxiliary domains.
+Denote the target DAG as ${\cal G}_0=\{ {\cal N},{\cal E}_0\}$, which encodes the joint distribution $P_0(\boldsymbol{x})$ of $\boldsymbol{x}=(x_1,...,x_p)^T$ with the precision matrix $\boldsymbol{\Theta}$. Suppose that there also exist $K$ auxiliary DAGs ${\cal G}_k=\{ {\cal N},{\cal E}_k\}$ with $k \in [K]$, encoding the joint distribution $P_k(\boldsymbol{x}^{(k)})$ of $\boldsymbol{x}^{(k)}=(x_1^{(k)},...,x_p^{(k)})^T$ with the precision matrix $\boldsymbol{\Theta}^{(k)}$ and the covariance matrix $\boldsymbol{\Sigma}^{(k)}$. The auxiliary domain $k$ can also be embedded into a linear SEM with different parameters including the continuous non-Gaussian noise $\epsilon^{(k)}_j$ and its variance $[\sigma_j^{(k)}]^2$. It is of great interest to improve the learning accuracy of ${\cal G}_0$ in the target domain by leveraging information from ${\cal G}_k$ in the auxiliary domains.
 
 The effectiveness of such a transfer learning task is heavily based on measuring the similarity between ${\cal G}_0$ and ${\cal G}_k$. In particular, we propose two similarity measures for DAG, corresponding to the strength or presence of causal effects between nodes in different domains as measured in the parameters or graph structures. Denote the divergence matrix  as $\boldsymbol{\Delta}^{(k)}_{{\cal S}_t} = \boldsymbol{\Theta}^{{\cal S}_t} \boldsymbol{\Sigma}^{(k)}_{{\cal S}_t} - \boldsymbol{I}_{|{\cal S}_t|}$, where $\boldsymbol{I}_{|{\cal S}_t|}$ is the $|{\cal S}_t|$-dimensional identity matrix. It measures the similarity between the precision matrices regarding the $t$-th layer in the target and the $k$-th auxiliary domains. By using $\boldsymbol{\Delta}^{(k)}_{{\cal S}_t}$, Definition 1 defines a parametric similarity between ${\cal G}_0$ and ${\cal G}_k$.
 
@@ -303,7 +303,7 @@ Definition 2. (Structural Similarity) \\
 From Definition 2a, a global structure-informative DAG needs to have exactly the same topological layers as the target DAG. It is important to remark that the global structural similarity concerns only the membership of nodes in each topological layer, and does not impose any requirements on edges between nodes in different layers. The layer-level structural similarity in Definition 2b focuses on the relative positions of one particular topological layer in ${\cal G}_0$ and ${\cal G}_k$. This similarity ensures that information from ${\cal G}_k$ can be efficiently transferred when constructing the topological layer of interest in ${\cal G}_0$. The node-level structural similarity in Definition 2c is a very weak requirement, focusing on local and microcosmic structures of DAGs. A node-$j$ structure-informative DAG only shares a similar relative position of node $j$ as ${\cal G}_0$, where the relative position can be depicted in two cases. Case (i) requires no overlap between node $j$'s descendants in ${\cal G}_k$ and ${\cal S}_{t_j}$ in ${\cal G}_0$, and thus information from ${\cal G}_k$ can prevent assigning node $j$ to a topological layer higher than $t_j$ in ${\cal G}_0$. Case (ii) requires node $j$'s descendants in ${\cal G}_k$ overlap with ${\cal A}_{t_j - 1}$ in ${\cal G}_0$, which can prevent assigning node $j$ to a topological layer lower than $t_j$ in ${\cal G}_0$. It can be verified that these three levels of structural similarities are progressive; that is, a global structure-informative DAG must be layer-$t$ structure-informative for all layers, and a layer-$t$ structure-informative DAG must be node-$j$ structure-informative for all nodes in ${\cal A}_t$. 
 For illustration, the following Figure gives some toy examples of these three structural similarities, where only two auxiliary DAGs are informative while others can be of arbitrary structure and thus non-informative.
 
-![Toy examples of three structural similarities](DAGsimilarity.jpg)
+![Toy examples of three structural similarities](DAGsimilarity.jpg){width=80%}
 
 
 It can be observed in Figure (a) that both ${\cal G}_1$ and ${\cal G}_2$ are global structure-informative, which have the same topological layers as ${\cal G}_0$ but their directed edge sets are all different. In Figure (b), ${\cal G}_1$ is layer-$0$ and layer-$1$ structure-informative, and ${\cal G}_2$ is layer-2 and layer-3 structure-informative. They share the same nodes in the respective layers as ${\cal G}_0$, but the composition of other layers is largely different. In Figure (c), ${\cal G}_1$ is node-2, node-4, and node-5 structure-informative, and ${\cal G}_2$ are node-1, node-3, and node-6 structure-informative. Take node-2 as an example, when constructing layer ${\cal A}_1$ of ${\cal G}_0$, ${\cal G}_1$ provides useful information to prevent mis-assigning node 2 to ${\cal A}_1$, since node 4 is a child of node 2 in ${\cal G}_1$ and belongs to ${\cal A}_1$ of ${\cal G}_0$. On the other hand, when constructing ${\cal A}_2$ of ${\cal G}_0$ after ${\cal A}_0$ and ${\cal A}_1$ are determined, ${\cal G}_1$ provides information to assign node 2 to ${\cal A}_2$, thanks to the fact that  node 2's descendants in ${\cal G}_1$ do not appear in ${\cal S}_2$ of ${\cal G}_0$. Similar observations can also be made for other nodes.
@@ -330,11 +330,9 @@ If $|\widehat{\cal S}_t|=1$,  set $\widehat{T}=t+1$ and $\widehat{\cal A}_{t}=\w
 
 In Step 2a, the distance covariance and its related independence test are employed. To be self-contained, we briefly restate its definition here. Given $\widehat{\cal S}_t \subseteq \{1,...,p\}$, the distance covariance between the expected residual $e_{j,\widehat{\cal S}_t}$ and the variable $x_l$ is defined as
 $\mbox{dcov}^2(e_{j,\widehat{\cal S}_t}, x_l)=I_{jtl,1} + I_{jtl,2} -2I_{jtl,3}$,
-where $
-I_{jtl,1}={{E}}[|e_{j,\widehat{\cal S}_t} - {e}'_{j,\widehat{\cal S}_t}||x_l - {x}'_l|],\
-I_{jtl,2}={E}[|e_{j,\widehat{\cal S}_t} - {e}'_{j,\widehat{\cal S}_t}|] {E}[|x_l - {x}'_l|]\ \mbox{and} \
-I_{jtl,3}={E} \big ( {E}[|e_{j,\widehat{\cal S}_t} - {e}'_{j,\widehat{\cal S}_t}||e_{j,\widehat{\cal S}_t}] {E}[|x_l - {x}'_l||x_l]\big )
-$ with ${e}'_{j,\widehat{\cal S}_t}$ and ${x}'_l$ denoting an independent copy of ${e}_{j,\widehat{\cal S}_t}$ and $x_l$, respectively. It provides a neat independence criterion in that $\mbox{dcov}^2(e_{j,\widehat{\cal S}_t}, x_l)= 0$ if $e_{j,\widehat{\cal S}_t} \perp \!\!\! \perp x_l$ and $\mbox{dcov}^2(e_{j,\widehat{\cal S}_t}, x_l) > 0$ otherwise.
+where $I_{jtl,1}={{E}}[|e_{j,\widehat{\cal S}_t} - {e}'_{j,\widehat{\cal S}_t}||x_l - {x}'_l|]$,
+$I_{jtl,2}={E}[|e_{j,\widehat{\cal S}_t} - {e}'_{j,\widehat{\cal S}_t}|] {E}[|x_l - {x}'_l|]$, and 
+$I_{jtl,3}={E} \big ( {E}[|e_{j,\widehat{\cal S}_t} - {e}'_{j,\widehat{\cal S}_t}||e_{j,\widehat{\cal S}_t}] {E}[|x_l - {x}'_l||x_l]\big )$ with ${e}'_{j,\widehat{\cal S}_t}$ and ${x}'_l$ denoting an independent copy of ${e}_{j,\widehat{\cal S}_t}$ and $x_l$, respectively. It provides a neat independence criterion in that $\mbox{dcov}^2(e_{j,\widehat{\cal S}_t}, x_l)= 0$ if $e_{j,\widehat{\cal S}_t} \perp \!\!\! \perp x_l$ and $\mbox{dcov}^2(e_{j,\widehat{\cal S}_t}, x_l) > 0$ otherwise.
 On the target domain, an empirical version of $\mbox{dcov}^2(e_{j,\widehat{\cal S}_t}, x_l)$ is 
 \begin{equation}\label{dcov-def}
 	\widehat{\mbox{dcov}}^2 (\widehat{\boldsymbol{e}}_{j,\widehat{\cal S}_t}, {\boldsymbol{x}}_l) = \widetilde{I}_{jtl,1} + \widetilde{I}_{jtl,2} -2\widetilde{I}_{jtl,3},
@@ -395,7 +393,7 @@ heterogeneous GGMMs, which goes far beyond the overall similarity and
 poses new challenges. The figure below provides an illustration on the
 difference between the existing literature and the proposed method.
 
-![Toy GGMM examples for the existing case and the proposed more challenging case. The different shapes of subgroups roughly reflect differences in precision matrices.](GGMM.jpg)
+![Toy GGMM examples for the existing case and the proposed more challenging case. The different shapes of subgroups roughly reflect differences in precision matrices.](GGMM.jpg){width=80%}
 
 It is clear that for any $\mathbf{\Theta}_{l}^{*}$ of the target domain,
 we only require that there exists some

@@ -2,6 +2,7 @@
 #'
 #' @author Mingyang Ren <renmingyang17@mails.ucas.ac.cn>.
 #' @references Ren, M., Zhen Y., and Wang J. (2022). Transfer learning for tensor graphical models.
+#'             Ren, M., He X., and Wang J. (2023). Structural transfer learning of non-Gaussian DAG.
 #' @usage trans_precision(t.data=NULL, A.data=NULL, precision.method="CLIME",
 #'                        cov.method="opt", cn.lam2=seq(1,2.5,length.out=10),
 #'                        theta.algm="cd", adjust.BIC=FALSE, symmetry=TRUE,

@@ -76,7 +76,7 @@ Evaluation.DAG(res.single$B, true_adjace)$Eval_result
 
 }
 \references{
-Ren, M., He X., and Wang J. (2022). Transfer learning for tensor graphical models.
+Ren, M., He X., and Wang J. (2023). Structural transfer learning of non-Gaussian DAG.
 }
 \author{
 Mingyang Ren \href{mailto:renmingyang17@mails.ucas.ac.cn}{renmingyang17@mails.ucas.ac.cn}, Xin He, and Junhui Wang

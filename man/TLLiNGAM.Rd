@@ -31,7 +31,16 @@ A result list including:
 Learning linear non-Gaussian DAG via topological layers.
 }
 \examples{
-# Please see vignettes.
+library(TransGraph)
+# load example data from github repository
+# Please refer to https://github.com/Ren-Mingyang/example_data_TransGraph
+# for detailed data information
+githublink = "https://github.com/Ren-Mingyang/example_data_TransGraph/"
+load(url(paste0(githublink,"raw/main/example.data.singleDAG.RData")))
+true_adjace = example.data.singleDAG$true_adjace
+t.data = example.data.singleDAG$X
+res.single = TLLiNGAM(t.data)
+Evaluation.DAG(res.single$B, true_adjace)$Eval_result
 
 
 }
