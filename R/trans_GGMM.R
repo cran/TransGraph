@@ -47,22 +47,32 @@ trans_GGMM = function(t.data, lambda.t, M, A.data, lambda.A.list, M.A.vec,
                       pseudo.cov="soft", cov.method="opt", cn.lam2=0.5, clambda.m=1,
                       theta.algm="cd", initial.selection="K-means", preselect.aux=0,
                       sel.type="L2", trace=FALSE ){
-  # This function will be improved in the next version
+
   init_GGMM = Init_trans_GGMM(t.data, lambda.t, M, A.data, lambda.A.list, M.A.vec, initial.selection, trace )
+  t.n.vec = init_GGMM$t.n.vec
   M0.hat = init_GGMM$M0.hat
   t.Theta_hat.array0 = init_GGMM$t.Theta_hat.array0
   t.mu_hat.mat0 = init_GGMM$t.mean
   res.target0 = init_GGMM$res.target
   if(pseudo.cov=="soft"){A.cov = init_GGMM$A.cov.soft; nA.vec=init_GGMM$nA.vec.soft}
   if(pseudo.cov=="hard"){A.cov = init_GGMM$A.cov.hard; nA.vec=init_GGMM$nA.vec.hard}
+  A.mean = init_GGMM$A.mean
 
   t.res = list()
   t.Theta_hat.array = t.Theta_hat.array0
   t.mu_hat.mat = t.mu_hat.mat0
   res.target = res.target0
   for (m in 1:M0.hat) {
-    t.Theta_hat.array[,,m] = t.Theta_hat.array0[,,m]
-    t.mu_hat.mat[m,] = t.mu_hat.mat0[m,]
+    ## tranfer precision
+    t.res[[m]] = trans_precision(cov.method=cov.method, cn.lam2=cn.lam2, theta.algm=theta.algm,
+                              input.A.cov=T, A.cov=A.cov, nA.vec=nA.vec,
+                              preselect.aux=preselect.aux, sel.type=sel.type,
+                              t.Theta.hat0=t.Theta_hat.array0[,,m], t.n=t.n.vec[m])
+    t.Theta_hat.array[,,m] = t.res[[m]]$Theta.hat
+
+    ## tranfer mean
+    t.mu_hat.mat[m,] = trans_mean(t.mu_hat.mat0[m,], A.mean, t.n.vec[m], clambda.m)
+
   }
   res.target$opt_Theta_hat = t.Theta_hat.array
   res.target$opt_Mu_hat = t.mu_hat.mat

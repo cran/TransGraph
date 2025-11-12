@@ -28,7 +28,7 @@ trans_precision(t.data=NULL, A.data=NULL, precision.method="CLIME",
 
 \item{symmetry}{Whether to symmetrize the final estimated precision matrices, and the default is True.}
 
-\item{preselect.aux}{Whether to pre-select informative auxiliary domains based on the distance between initially estimated auxiliary and target parameters. The default is 0, which means that pre-selection will not be performed. If "preselect.aux" is specified as a real number greater than zero, then the threshold value is forpreselect.aux\emph{s}sqrt( log(p) / n ).}
+\item{preselect.aux}{Whether to pre-select informative auxiliary domains based on the distance between initially estimated auxiliary and target parameters. The default is 0, which means that pre-selection will not be performed. If "preselect.aux" is specified as a real number greater than zero, then the threshold value is preselect.aux\emph{s}sqrt( log(p) / n ).}
 
 \item{sel.type}{If pre-selection should be performed, "sel.type" is the type of distance. The default is L2 norm, and can be specified as "L1" to use L1 norm.}
 
@@ -55,41 +55,6 @@ A result list including:
 }
 \description{
 The transfer learning for vector-valued precision matrix via D-trace loss method.
-}
-\examples{
-\donttest{
-library(TransGraph)
-# load example data from github repository
-# Please refer to https://github.com/Ren-Mingyang/example_data_TransGraph
-# for detailed data information
-githublink = "https://github.com/Ren-Mingyang/example_data_TransGraph/"
-load(url(paste0(githublink,"raw/main/example.data.GGM.RData")))
-t.data = example.data.GGM$target.list$t.data
-t.precision = example.data.GGM$target.list$t.precision
-A.data = example.data.GGM$A.data
-A.data.infor = example.data.GGM$A.data.infor
-
-# using all auxiliary domains
-res.trans.weight = trans_precision(t.data, A.data, cov.method="weight")
-res.trans.opt = trans_precision(t.data, A.data, cov.method="opt")
-res.trans.size = trans_precision(t.data, A.data, cov.method="size")
-Theta.trans.weight = res.trans.weight$Theta.hat
-Theta.trans.opt = res.trans.opt$Theta.hat
-Theta.trans.size = res.trans.size$Theta.hat
-Theta.single = res.trans.weight$Theta.hat0  # initial rough estimation via the target domain
-Theta.single[abs(Theta.single)<0.0001] = 0
-
-Evaluation.GGM(Theta.single, t.precision)
-Evaluation.GGM(Theta.trans.weight, t.precision)
-Evaluation.GGM(Theta.trans.opt, t.precision)
-Evaluation.GGM(Theta.trans.size, t.precision)
-
-# using informative auxiliary domains
-res.trans.size.oracle = trans_precision(t.data, A.data.infor, cov.method="size")
-Evaluation.GGM(res.trans.size.oracle$Theta.hat, t.precision)
-}
-
-
 }
 \references{
 Ren, M., Zhen Y., and Wang J. (2022). Transfer learning for tensor graphical models.

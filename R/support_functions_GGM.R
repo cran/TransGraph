@@ -44,8 +44,11 @@ Initial_GGM = function(t.data=NULL, A.data=NULL, precision.method="glasso",
       if(!input.A.cov){A.S.hat.list0[[k]] = cov(A.data[[k]]); nA.vec[k] = dim(A.data[[k]])[1]}
       if(input.A.cov){A.S.hat.list0[[k]] = A.cov[[k]]; nA.vec = nA.vec }
     }
+    A.S.hat.list00 = A.S.hat.list0
+    nA.vec00 = nA.vec
 
     ## pre-select informative auxiliary domains, if preselect.aux > 0
+    delta.vec = rep(0,K)
     if(preselect.aux > 0){
       s = max(apply(Theta.hat0, 2, function(x) sum(x!=0) ))
       lam.preaux = preselect.aux * s * sqrt(log(p)/n)
@@ -55,14 +58,15 @@ Initial_GGM = function(t.data=NULL, A.data=NULL, precision.method="glasso",
       }
       A.S.hat.list0.select = list()
       nA.vec.select = c()
-      A.data.select = A.data
-      A.cov.select=A.cov
+      A.data.select = list()
+      A.cov.select = list()
       vk = 1
       for (k in 1:K) {
         delta.k.l1 = max(apply(A.S.hat.list0[[k]] %*% Theta.hat0 - diag(p), 2, function(x) sum(abs(x))))
         if(sel.type=="L2"){
           delta.k.l1 = sum((A.S.hat.list0[[k]] %*% Theta.hat0 - diag(p))^2)
         }
+        delta.vec[k] = delta.k.l1
         if(delta.k.l1 < lam.preaux){
           A.S.hat.list0.select[[vk]] = A.S.hat.list0[[k]]
           nA.vec.select[vk] = nA.vec[k]
@@ -71,14 +75,27 @@ Initial_GGM = function(t.data=NULL, A.data=NULL, precision.method="glasso",
           vk = vk+1
         }
       }
-      if(vk == 1){
-        warning("Warning: There is no informative auxiliary domains at the current set threshold! Please raise the threshold 'preselect.aux' or use the target domain only.")
-        # break
-      }
+
       A.S.hat.list0 = A.S.hat.list0.select
       nA.vec = nA.vec.select
       K = length(A.S.hat.list0)
-    } else {A.data.select = A.data; A.cov.select = A.cov}
+      noninfor = F
+
+      if(vk == 1){
+        warning("Warning: There is no informative auxiliary domains at the current set threshold!
+                  The current output result is based on the target domain only.
+                  You may consider to raise the threshold 'preselect.aux'.")
+        A.data.select = NULL
+        A.cov.select = NULL
+        A.S.hat.list0 = A.S.hat.list00
+        nA.vec = nA.vec00
+        K = length(A.S.hat.list0)
+        noninfor = T
+      }
+
+
+    } else {A.data.select = A.data; A.cov.select = A.cov;
+            noninfor = F; lam.preaux=NULL}
 
     # covariance matrix weighted by the sample sizes
     S.hat.A.M.size = diag(p) - diag(p)
@@ -122,6 +139,7 @@ Initial_GGM = function(t.data=NULL, A.data=NULL, precision.method="glasso",
     }
 
     ## pre-select informative auxiliary domains, if preselect.aux > 0
+    delta.vec = rep(0,K)
     if(preselect.aux > 0){
       s = max(apply(Theta.hat0, 2, function(x) sum(x!=0) ))
       lam.preaux = preselect.aux * s * sqrt(log(p)/n)
@@ -147,14 +165,26 @@ Initial_GGM = function(t.data=NULL, A.data=NULL, precision.method="glasso",
           vk = vk+1
         }
       }
-      if(vk == 1){
-        warning("Warning: There is no informative auxiliary domains at the current set threshold! Please raise the threshold 'preselect.aux' or use the target domain only.")
-        # break
-      }
+
       A.S.hat.list0 = A.S.hat.list0.select
       K = length(A.S.hat.list0)
       nA.vec = nA.vec.select
-    } else {A.data.select = A.data; A.cov.select = A.cov}
+      noninfor = F
+
+      if(vk == 1){
+        warning("Warning: There is no informative auxiliary domains at the current set threshold!
+                  The current output result is based on the target domain only.
+                  You may consider to raise the threshold 'preselect.aux'.")
+        A.data.select = NULL
+        A.cov.select = NULL
+        A.S.hat.list0 = A.data
+        nA.vec = nA.vec
+        K = length(A.S.hat.list0)
+        noninfor = T
+      }
+
+    } else {A.data.select = A.data; A.cov.select = A.cov;
+            noninfor = F; lam.preaux=NULL}
 
     # covariance matrix weighted by the sample sizes
     S.hat.A.M.size = diag(p) - diag(p)
@@ -191,12 +221,13 @@ Initial_GGM = function(t.data=NULL, A.data=NULL, precision.method="glasso",
 
   }
 
-
+  infor.num = c(1:K)[delta.vec < lam.preaux]
   res = list(Theta.hat0 = Theta.hat0, A.data.select=A.data.select, A.cov.select=A.cov.select,
-             S.hat.A.size=S.hat.A.M.size,
-             S.hat.A.weight=S.hat.A.weight,
+             S.hat.A.size = S.hat.A.M.size,
+             S.hat.A.weight = S.hat.A.weight,
              S.hat.A.opt = S.hat.A.opt, k.check = k.check,
-             n = n, p = p, N = min(nA.vec), nA.vec=nA.vec)
+             n = n, p = p, N = min(nA.vec), nA.vec=nA.vec, noninfor=noninfor,
+             delta.vec=delta.vec, lam.preaux=lam.preaux, infor.num = infor.num)
   return(res)
 
 
@@ -287,7 +318,7 @@ S_soft.vec = function(z,lambda,ej=rep(1,length(z))){
   return(sign(z) * (n.z > 0) * n.z)
 }
 
-BIC.value = function(S.hat.A, delta.hat, Theta.hat, n=100, adjust=F){
+BIC_value = function(S.hat.A, delta.hat, Theta.hat, n=100, adjust=F){
   pm = dim(S.hat.A)[1]
   deltaI = delta.hat + diag(pm)
   fitness = 0.5*sum(diag(t(Theta.hat) %*% S.hat.A %*% Theta.hat)) - sum(diag( t(deltaI) %*%  Theta.hat))

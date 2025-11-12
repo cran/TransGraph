@@ -56,7 +56,7 @@ Theta.tuning = function(lambda2, S.hat.A, delta.hat, Omega.hat0=NULL, n.A,
     lam2 = lambda2[l]
     Theta.hat.m = Theta.est(S.hat.A, delta.hat, lam2=lam2,
                             Omega.hat0=Omega.hat0, method = theta.algm)
-    BIC.list = BIC.value(S.hat.A, delta.hat, Theta.hat.m, n.A, adjust.BIC)
+    BIC.list = BIC_value(S.hat.A, delta.hat, Theta.hat.m, n.A, adjust.BIC)
     BIC.summary[l,] = c(lam2, unlist(BIC.list))
     Theta.list[[l]] = Theta.hat.m
   }

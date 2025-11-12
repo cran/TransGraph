@@ -30,20 +30,6 @@ A result list including:
 \description{
 Learning linear non-Gaussian DAG via topological layers.
 }
-\examples{
-library(TransGraph)
-# load example data from github repository
-# Please refer to https://github.com/Ren-Mingyang/example_data_TransGraph
-# for detailed data information
-githublink = "https://github.com/Ren-Mingyang/example_data_TransGraph/"
-load(url(paste0(githublink,"raw/main/example.data.singleDAG.RData")))
-true_adjace = example.data.singleDAG$true_adjace
-t.data = example.data.singleDAG$X
-res.single = TLLiNGAM(t.data)
-Evaluation.DAG(res.single$B, true_adjace)$Eval_result
-
-
-}
 \references{
 Zhao, R., He X., and Wang J. (2022). Learning linear non-Gaussian directed acyclic graph with diverging number of nodes. Journal of Machine Learning Research.
 }

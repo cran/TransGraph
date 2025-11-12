@@ -1,17 +1,19 @@
 Init_trans_GGMM = function(t.data, lambda.t, M, A.data, lambda.A.list, M.A.vec,
                            initial.selection="K-means", trace=F ){
-  # This function will be improved in the next version
   p = dim(t.data)[2]
   res.target = GGMPF(lambda.t, t.data, M, initial.selection=initial.selection, trace = trace)
   t.Theta_hat.array0 = res.target$opt_Theta_hat
   M0.hat = res.target$K_hat
+  t.member = res.target$opt_member
+  MM.K = sort(unique(t.member))
+  t.n.vec = apply(res.target$opt_L.mat, 2, sum)
   t.mean = res.target$opt_Mu_hat
-  A.mean = t.mean
 
   K = length(A.data)
   res.aux.list = list()
   for (k in 1:K) {
-    res.aux.list[[k]] = res.target
+    res.k = GGMPF(lambda.A.list[[k]], A.data[[k]], M.A.vec[k], initial.selection=initial.selection, trace = trace)
+    res.aux.list[[k]] = res.k
   }
 
   #### auxiliary covarianve matrices
@@ -21,15 +23,53 @@ Init_trans_GGMM = function(t.data, lambda.t, M, A.data, lambda.A.list, M.A.vec,
   v = 1
   for (k in 1:K) {
     A.data.k = A.data[[k]]
-    for (m in M0.hat) {
-      A.cov.soft[[v]] = solve(t.Theta_hat.array0[,,m])
+    res.k = res.aux.list[[k]]
+    member.k = res.k$opt_member
+    MM.K = sort(unique(member.k))
+    L.mat.k = res.k$opt_L.mat
+    mu.k = res.k$opt_Mu_hat
+    for (m in MM.K) {
+      nm = sum(member.k == m)
+      nA.vec.soft[v] = nm
+      L_ikx = sqrt(L.mat.k[,match(m,MM.K)])*t(t(A.data.k) - mu.k[match(m,MM.K),])
+      A.cov.soft[[v]] = t(L_ikx) %*% L_ikx / nm
       v = v+1
     }
   }
-  A.cov.hard = A.cov.soft
-  nA.vec.hard = nA.vec.soft
 
-  res = list(t.Theta_hat.array0=t.Theta_hat.array0, M0.hat=M0.hat, t.mean=t.mean,
+  # auxiliary pseudo.cov: subgrouping refitting
+  A.cov.hard = list()
+  nA.vec.hard = c()
+  v = 1
+  for (k in 1:K) {
+    A.data.k = A.data[[k]]
+    res.k = res.aux.list[[k]]
+    member.k = res.k$opt_member
+    MM.K = sort(unique(member.k))
+    for (m in MM.K) {
+      nm = sum(member.k == m)
+      nA.vec.hard[v] = nm
+      A.cov.hard[[v]] = cov(A.data.k[member.k == m,])
+      v = v+1
+    }
+  }
+
+  v0 = v-1
+  #### auxiliary mean vectors
+  A.mean = matrix(0, ncol = p, nrow = v0)
+  v = 1
+  for (k in 1:K) {
+    res.k = res.aux.list[[k]]
+    member.k = res.k$opt_member
+    MM.K = sort(unique(member.k))
+    for (m in MM.K) {
+      A.mean[v,] = res.k$opt_Mu_hat[m,]
+      v = v+1
+    }
+  }
+
+
+  res = list(t.Theta_hat.array0=t.Theta_hat.array0, M0.hat=M0.hat, t.n.vec=t.n.vec, t.mean=t.mean,
              A.cov.soft=A.cov.soft, A.cov.hard=A.cov.hard, A.mean=A.mean,
              nA.vec.soft=nA.vec.soft, nA.vec.hard=nA.vec.hard,
              res.target=res.target, res.aux.list=res.aux.list)

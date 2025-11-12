@@ -52,29 +52,6 @@ A result list including:
 \description{
 Structural transfer learning of non-Gaussian DAG.
 }
-\examples{
-\donttest{
-library(TransGraph)
-# load example data from github repository
-# Please refer to https://github.com/Ren-Mingyang/example_data_TransGraph
-# for detailed data information
-githublink = "https://github.com/Ren-Mingyang/example_data_TransGraph/"
-load(url(paste0(githublink,"raw/main/example.data.DAG.RData")))
-t.data = example.data.DAG$target.DAG.data$X
-true_adjace = example.data.DAG$target.DAG.data$true_adjace
-A.data = example.data.DAG$auxiliary.DAG.data$X.list.A
-
-# transfer method
-res.trans = trans.local.DAG(t.data, A.data)
-# Topological Layer method-based single-task learning (JLMR, 2022)
-res.single = TLLiNGAM(t.data)
-
-Evaluation.DAG(res.trans$B, true_adjace)$Eval_result
-Evaluation.DAG(res.single$B, true_adjace)$Eval_result
-}
-
-
-}
 \references{
 Ren, M., He X., and Wang J. (2023). Structural transfer learning of non-Gaussian DAG.
 }
